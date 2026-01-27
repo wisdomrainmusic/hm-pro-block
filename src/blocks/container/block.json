@@ -6,19 +6,32 @@
   "category": "hm-pro",
   "icon": "screenoptions",
   "description": "A layout container that can hold other blocks.",
-  "keywords": ["hm", "container", "layout", "section"],
+  "keywords": [
+    "hm",
+    "container",
+    "layout",
+    "section"
+  ],
   "supports": {
     "html": false,
     "anchor": true
   },
   "attributes": {
-    "isFullWidth": { "type": "boolean", "default": false },
+    "isFullWidth": {
+      "type": "boolean",
+      "default": false
+    },
     "padding": {
       "type": "object",
-      "default": { "top": 0, "right": 0, "bottom": 0, "left": 0 }
+      "default": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
     }
   },
-  "editorScript": "hmpb-editor",
-  "style": "hmpb-frontend",
-  "editorStyle": "hmpb-editor"
+  "editorScript": "file:../../../build/editor.js",
+  "style": "file:../../../src/styles/frontend.css",
+  "editorStyle": "file:../../../src/styles/editor.css"
 }

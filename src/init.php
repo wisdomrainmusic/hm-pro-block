@@ -57,3 +57,14 @@ add_action( 'wp_enqueue_scripts', function () {
 		HMPB_VER
 	);
 }, 20 );
+
+
+// Admin notice to confirm plugin is active (dev only; remove later)
+add_action('admin_notices', function () {
+    if ( ! current_user_can('manage_options') ) return;
+    if ( ! function_exists('get_current_screen') ) return;
+    $screen = get_current_screen();
+    if ( $screen && $screen->id === 'plugins' ) {
+        echo '<div class="notice notice-info"><p><strong>HM Pro Blocks:</strong> plugin loaded.</p></div>';
+    }
+});
