@@ -1,3 +1,10 @@
 /* HM Pro Blocks editor styles */
 .hmpb-container{border:1px dashed rgba(0,0,0,.15);padding:16px;min-height:60px}
 .hmpb-container.is-fullwidth{width:100%}
+/* Layout picker (Spectra-like) */
+.hmpb-layout-picker{text-align:center;padding:28px 16px;background:rgba(0,0,0,.02);border:1px dashed rgba(0,0,0,.12);border-radius:10px}
+.hmpb-layout-picker__title{font-weight:600;margin-bottom:6px}
+.hmpb-layout-picker__sub{opacity:.7;font-size:12px;margin-bottom:16px}
+.hmpb-layout-picker__grid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hmpb-layout-btn{width:54px;height:40px;border:1px solid rgba(0,0,0,.15);border-radius:8px;background:#fff;cursor:pointer;font-weight:600}
+.hmpb-layout-btn:hover{border-color: rgba(0,0,0,.28)}
