@@ -1,1 +1,10 @@
 /* Frontend styles will be added per block. */
+
+/* HM Container - frontend */
+.hmpb-container {
+	width: 100%;
+}
+
+.hmpb-container.is-fullwidth {
+	width: 100%;
+}
