@@ -1,0 +1,1 @@
+/* Placeholder build file for view scripts. */
