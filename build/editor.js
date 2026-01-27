@@ -4,11 +4,58 @@
 	const { Fragment } = wp.element;
 	const { InspectorControls, InnerBlocks } = wp.blockEditor;
 	const { PanelBody, ToggleControl, RangeControl } = wp.components;
+	const { useSelect, useDispatch } = wp.data;
 
 	registerBlockType('hm-pro/container', {
 		edit: (props) => {
 			const { attributes, setAttributes } = props;
+			const { clientId } = props;
 			const { isFullWidth, padding } = attributes;
+
+			// Detect if container is empty (no inner blocks yet)
+			const hasInnerBlocks = useSelect((select) => {
+				const block = select('core/block-editor').getBlock(clientId);
+				return !!(block && block.innerBlocks && block.innerBlocks.length);
+			}, [clientId]);
+
+			const { replaceInnerBlocks } = useDispatch('core/block-editor');
+
+			// Templates for columns
+			const tpl1 = [
+				wp.blocks.createBlock('core/columns', {}, [
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Write…', 'hm-pro-blocks') })
+					])
+				])
+			];
+			const tpl2 = [
+				wp.blocks.createBlock('core/columns', {}, [
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Left…', 'hm-pro-blocks') })
+					]),
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Right…', 'hm-pro-blocks') })
+					])
+				])
+			];
+			const tpl3 = [
+				wp.blocks.createBlock('core/columns', {}, [
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 1…', 'hm-pro-blocks') })
+					]),
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 2…', 'hm-pro-blocks') })
+					]),
+					wp.blocks.createBlock('core/column', {}, [
+						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 3…', 'hm-pro-blocks') })
+					])
+				])
+			];
+
+			const insertLayout = (n) => {
+				const blocks = n === 1 ? tpl1 : (n === 2 ? tpl2 : tpl3);
+				replaceInnerBlocks(clientId, blocks, true);
+			};
 
 			return (
 				wp.element.createElement(Fragment, {},
@@ -58,9 +105,18 @@
 							paddingLeft: (padding?.left ?? 0) + 'px'
 						}
 					},
-						wp.element.createElement(InnerBlocks, {
-							placeholder: __('Drop blocks here…', 'hm-pro-blocks')
-						})
+						// If empty: show Spectra-like layout chooser
+						!hasInnerBlocks
+							? wp.element.createElement('div', { className: 'hmpb-layout-picker' },
+								wp.element.createElement('div', { className: 'hmpb-layout-picker__title' }, __('Container', 'hm-pro-blocks')),
+								wp.element.createElement('div', { className: 'hmpb-layout-picker__sub' }, __('Select a container layout to start with.', 'hm-pro-blocks')),
+								wp.element.createElement('div', { className: 'hmpb-layout-picker__grid' },
+									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(1) }, '1'),
+									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(2) }, '2'),
+									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(3) }, '3')
+								)
+							)
+							: wp.element.createElement(InnerBlocks, { placeholder: __('Drop blocks here…', 'hm-pro-blocks') })
 					)
 				)
 			);
