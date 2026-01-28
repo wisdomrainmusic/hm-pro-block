@@ -1,40 +1,28 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+
+/**
+ * Server-side renderer for HM Container.
+ */
+
+function hm_pro_render_container_block( $attributes, $content ) {
+    $classes = array( 'hm-container' );
+
+    // Back-compat toggle for full width.
+    if ( ! empty( $attributes['isFullWidth'] ) ) {
+        $classes[] = 'alignfull';
+    }
+
+    $wrapper_attributes = get_block_wrapper_attributes( array(
+        'class' => implode( ' ', $classes ),
+    ) );
+
+    return sprintf(
+        '<div %1$s>%2$s</div>',
+        $wrapper_attributes,
+        $content
+    );
 }
 
-add_action( 'init', function () {
-	$dir = HMPB_PATH . 'src/blocks/container';
-
-	if ( file_exists( $dir . '/block.json' ) ) {
-		register_block_type_from_metadata(
-			$dir,
-			[
-				'render_callback' => function ( $attrs, $content ) {
-					$classes = [ 'hmpb-container' ];
-					if ( ! empty( $attrs['isFullWidth'] ) ) {
-						$classes[] = 'is-fullwidth';
-					}
-
-					$style = '';
-					// basic padding support (desktop only in render; editor can be responsive)
-					if ( isset( $attrs['padding'] ) && is_array( $attrs['padding'] ) ) {
-						$p      = $attrs['padding'];
-						$top    = isset( $p['top'] ) ? intval( $p['top'] ) : 0;
-						$right  = isset( $p['right'] ) ? intval( $p['right'] ) : 0;
-						$bottom = isset( $p['bottom'] ) ? intval( $p['bottom'] ) : 0;
-						$left   = isset( $p['left'] ) ? intval( $p['left'] ) : 0;
-						$style  = sprintf( 'style="padding:%dpx %dpx %dpx %dpx;"', $top, $right, $bottom, $left );
-					}
-
-					return sprintf(
-						'<div class="%s" %s>%s</div>',
-						esc_attr( implode( ' ', $classes ) ),
-						$style,
-						$content
-					);
-				},
-			]
-		);
-	}
-} );
+register_block_type( __DIR__, array(
+    'render_callback' => 'hm_pro_render_container_block',
+) );

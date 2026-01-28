@@ -1,179 +1,146 @@
+/*
+ * HM Pro Blocks – Editor Script (no build step)
+ *
+ * Registers hm-pro/container.
+ */
 (function (wp) {
-	const { registerBlockType, registerBlockVariation } = wp.blocks;
-	const { __ } = wp.i18n;
-	const { Fragment } = wp.element;
-	const { InspectorControls, InnerBlocks } = wp.blockEditor;
-	const { PanelBody, ToggleControl, RangeControl } = wp.components;
-	const { useSelect, useDispatch } = wp.data;
+  if (!wp || !wp.blocks || !wp.blockEditor) return;
 
-	registerBlockType('hm-pro/container', {
-		edit: (props) => {
-			const { attributes, setAttributes } = props;
-			const { clientId } = props;
-			const { isFullWidth, padding } = attributes;
+  var el = wp.element.createElement;
+  var Fragment = wp.element.Fragment;
+  var __ = wp.i18n.__;
 
-			// Detect if container is empty (no inner blocks yet)
-			const hasInnerBlocks = useSelect((select) => {
-				const block = select('core/block-editor').getBlock(clientId);
-				return !!(block && block.innerBlocks && block.innerBlocks.length);
-			}, [clientId]);
+  var registerBlockType = wp.blocks.registerBlockType;
+  var createBlock = wp.blocks.createBlock;
 
-			const { replaceInnerBlocks } = useDispatch('core/block-editor');
+  var blockEditor = wp.blockEditor;
+  var useBlockProps = blockEditor.useBlockProps;
+  var InnerBlocks = blockEditor.InnerBlocks;
+  var InspectorControls = blockEditor.InspectorControls;
 
-			// Templates for columns
-			const tpl1 = [
-				wp.blocks.createBlock('core/columns', {}, [
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Write…', 'hm-pro-blocks') })
-					])
-				])
-			];
-			const tpl2 = [
-				wp.blocks.createBlock('core/columns', {}, [
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Left…', 'hm-pro-blocks') })
-					]),
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Right…', 'hm-pro-blocks') })
-					])
-				])
-			];
-			const tpl3 = [
-				wp.blocks.createBlock('core/columns', {}, [
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 1…', 'hm-pro-blocks') })
-					]),
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 2…', 'hm-pro-blocks') })
-					]),
-					wp.blocks.createBlock('core/column', {}, [
-						wp.blocks.createBlock('core/paragraph', { placeholder: __('Col 3…', 'hm-pro-blocks') })
-					])
-				])
-			];
+  var components = wp.components;
+  var PanelBody = components.PanelBody;
+  var ToggleControl = components.ToggleControl;
+  var Button = components.Button;
 
-			const insertLayout = (n) => {
-				const blocks = n === 1 ? tpl1 : (n === 2 ? tpl2 : tpl3);
-				replaceInnerBlocks(clientId, blocks, true);
-			};
+  var data = wp.data;
+  var useSelect = data.useSelect;
+  var useDispatch = data.useDispatch;
 
-			return (
-				wp.element.createElement(Fragment, {},
-					wp.element.createElement(InspectorControls, {},
-						wp.element.createElement(PanelBody, { title: __('Layout', 'hm-pro-blocks'), initialOpen: true },
-							wp.element.createElement(ToggleControl, {
-								label: __('Full Width', 'hm-pro-blocks'),
-								checked: !!isFullWidth,
-								onChange: (v) => setAttributes({ isFullWidth: !!v })
-							}),
-							wp.element.createElement(RangeControl, {
-								label: __('Padding (Top)', 'hm-pro-blocks'),
-								value: padding?.top ?? 0,
-								min: 0,
-								max: 120,
-								onChange: (v) => setAttributes({ padding: { ...padding, top: v } })
-							}),
-							wp.element.createElement(RangeControl, {
-								label: __('Padding (Right)', 'hm-pro-blocks'),
-								value: padding?.right ?? 0,
-								min: 0,
-								max: 120,
-								onChange: (v) => setAttributes({ padding: { ...padding, right: v } })
-							}),
-							wp.element.createElement(RangeControl, {
-								label: __('Padding (Bottom)', 'hm-pro-blocks'),
-								value: padding?.bottom ?? 0,
-								min: 0,
-								max: 120,
-								onChange: (v) => setAttributes({ padding: { ...padding, bottom: v } })
-							}),
-							wp.element.createElement(RangeControl, {
-								label: __('Padding (Left)', 'hm-pro-blocks'),
-								value: padding?.left ?? 0,
-								min: 0,
-								max: 120,
-								onChange: (v) => setAttributes({ padding: { ...padding, left: v } })
-							})
-						)
-					),
-					wp.element.createElement('div', {
-						className: `hmpb-container ${isFullWidth ? 'is-fullwidth' : ''}`,
-						style: {
-							paddingTop: (padding?.top ?? 0) + 'px',
-							paddingRight: (padding?.right ?? 0) + 'px',
-							paddingBottom: (padding?.bottom ?? 0) + 'px',
-							paddingLeft: (padding?.left ?? 0) + 'px'
-						}
-					},
-						// If empty: show Spectra-like layout chooser
-						!hasInnerBlocks
-							? wp.element.createElement('div', { className: 'hmpb-layout-picker' },
-								wp.element.createElement('div', { className: 'hmpb-layout-picker__title' }, __('Container', 'hm-pro-blocks')),
-								wp.element.createElement('div', { className: 'hmpb-layout-picker__sub' }, __('Select a container layout to start with.', 'hm-pro-blocks')),
-								wp.element.createElement('div', { className: 'hmpb-layout-picker__grid' },
-									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(1) }, '1'),
-									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(2) }, '2'),
-									wp.element.createElement('button', { type: 'button', className: 'hmpb-layout-btn', onClick: () => insertLayout(3) }, '3')
-								)
-							)
-							: wp.element.createElement(InnerBlocks, { placeholder: __('Drop blocks here…', 'hm-pro-blocks') })
-					)
-				)
-			);
-		},
-		save: () => {
-			return wp.element.createElement('div', {},
-				wp.element.createElement(InnerBlocks.Content, {})
-			);
-		}
-	});
+  function buildColumnsTemplate(count) {
+    var cols = [];
+    for (var i = 0; i < count; i++) {
+      cols.push(createBlock('core/column', {}, []));
+    }
+    return [createBlock('core/columns', {}, cols)];
+  }
 
-	// --- Variations (Spectra container starter layouts) ---
-	const COL_TPL_1 = [
-		['core/columns', {}, [
-			['core/column', {}, []]
-		]]
-	];
+  function LayoutPicker(props) {
+    return el(
+      'div',
+      { className: 'hm-container__picker' },
+      el('div', { className: 'hm-container__picker-title' }, __('Container', 'hm-pro-blocks')),
+      el(
+        'div',
+        { className: 'hm-container__picker-subtitle' },
+        __('Select a container layout to start with.', 'hm-pro-blocks')
+      ),
+      el(
+        'div',
+        { className: 'hm-container__picker-buttons' },
+        [1, 2, 3].map(function (n) {
+          return el(
+            Button,
+            {
+              key: 'layout-' + n,
+              variant: 'secondary',
+              onClick: function () {
+                props.onPick(n);
+              },
+            },
+            String(n)
+          );
+        })
+      )
+    );
+  }
 
-	const COL_TPL_2 = [
-		['core/columns', {}, [
-			['core/column', {}, []],
-			['core/column', {}, []]
-		]]
-	];
+  registerBlockType('hm-pro/container', {
+    edit: function (props) {
+      var attributes = props.attributes || {};
+      var clientId = props.clientId;
 
-	const COL_TPL_3 = [
-		['core/columns', {}, [
-			['core/column', {}, []],
-			['core/column', {}, []],
-			['core/column', {}, []]
-		]]
-	];
+      var isFullWidth = !!attributes.isFullWidth;
+      var columnCount = attributes.columnCount || 0;
 
-	registerBlockVariation('hm-pro/container', {
-		name: 'hm-1col',
-		title: '1 Column',
-		description: 'Start with a single column layout.',
-		attributes: { isFullWidth: false },
-		innerBlocks: COL_TPL_1,
-		scope: ['inserter']
-	});
+      var blockProps = useBlockProps({
+        className: ['hm-container', isFullWidth ? 'alignfull' : ''].filter(Boolean).join(' '),
+      });
 
-	registerBlockVariation('hm-pro/container', {
-		name: 'hm-2col',
-		title: '2 Columns',
-		description: 'Start with a two column layout.',
-		attributes: { isFullWidth: false },
-		innerBlocks: COL_TPL_2,
-		scope: ['inserter']
-	});
+      var innerBlocks = useSelect(
+        function (select) {
+          return select('core/block-editor').getBlocks(clientId);
+        },
+        [clientId]
+      );
 
-	registerBlockVariation('hm-pro/container', {
-		name: 'hm-3col',
-		title: '3 Columns',
-		description: 'Start with a three column layout.',
-		attributes: { isFullWidth: false },
-		innerBlocks: COL_TPL_3,
-		scope: ['inserter']
-	});
+      var dispatch = useDispatch('core/block-editor');
+
+      function setLayout(count) {
+        // 1) Persist choice
+        props.setAttributes({ columnCount: count });
+
+        // 2) Create nested core/columns with N columns
+        var newBlocks = buildColumnsTemplate(count);
+        dispatch.replaceInnerBlocks(clientId, newBlocks, false);
+
+        // 3) Focus the newly created columns block
+        if (newBlocks && newBlocks[0] && newBlocks[0].clientId) {
+          dispatch.selectBlock(newBlocks[0].clientId);
+        }
+      }
+
+      var showPicker = (!columnCount || !innerBlocks || innerBlocks.length === 0);
+
+      return el(
+        Fragment,
+        null,
+        el(
+          InspectorControls,
+          null,
+          el(
+            PanelBody,
+            { title: __('Layout', 'hm-pro-blocks'), initialOpen: true },
+            el(ToggleControl, {
+              label: __('Full Width', 'hm-pro-blocks'),
+              checked: isFullWidth,
+              onChange: function (value) {
+                props.setAttributes({ isFullWidth: !!value });
+              },
+            })
+          )
+        ),
+        el(
+          'div',
+          blockProps,
+          showPicker
+            ? el(LayoutPicker, { onPick: setLayout })
+            : el(InnerBlocks, {
+                renderAppender: InnerBlocks.ButtonBlockAppender,
+              })
+        )
+      );
+    },
+
+    save: function (props) {
+      var attrs = props.attributes || {};
+      var isFullWidth = !!attrs.isFullWidth;
+
+      var blockProps = wp.blockEditor.useBlockProps.save({
+        className: ['hm-container', isFullWidth ? 'alignfull' : ''].filter(Boolean).join(' '),
+      });
+
+      return el('div', blockProps, el(InnerBlocks.Content, null));
+    },
+  });
 })(window.wp);

@@ -1,37 +1,29 @@
 {
-  "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 2,
   "name": "hm-pro/container",
   "title": "HM Container",
   "category": "hm-pro",
   "icon": "screenoptions",
   "description": "A layout container that can hold other blocks.",
-  "keywords": [
-    "hm",
-    "container",
-    "layout",
-    "section"
-  ],
   "supports": {
     "html": false,
-    "anchor": true
+    "align": ["wide", "full"],
+    "spacing": {
+      "padding": true,
+      "margin": true
+    }
   },
   "attributes": {
     "isFullWidth": {
       "type": "boolean",
       "default": false
     },
-    "padding": {
-      "type": "object",
-      "default": {
-        "top": 0,
-        "right": 0,
-        "bottom": 0,
-        "left": 0
-      }
+    "columnCount": {
+      "type": "number",
+      "default": 0
     }
   },
-  "editorScript": "file:../../../build/editor.js",
-  "style": "file:../../../src/styles/frontend.css",
-  "editorStyle": "file:../../../src/styles/editor.css"
+  "editorScript": "file:../../build/editor.js",
+  "editorStyle": "file:../../build/editor.css",
+  "style": "file:../../build/style.css"
 }
